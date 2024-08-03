@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Table</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <script async src="{{{appclient}}}"></script>
+
+    <style>
+        body {
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+
+        table.dataTable thead th {
+            background-color: #e9ecef;
+        }
+
+        .modal-body img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .text-center {
+        text-align: center;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="bg-dark text-white text-center py-3">
+            <h1>Order Data Visualization</h1>
+        </header>
+        <main class="container my-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Orders by Date and Status</h2>
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </main>    
+    </div>
+    <div class="container">
+        <header class="bg-dark text-white text-center py-3">
+        <h2>Orders</h2>
+        </header>
+        <br>
+        <br>
+        <table id="ordersTable" class="table table-striped table-bordered" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="text-center">Order Id</th>
+                    <th class="text-center">Order Status</th>
+                    <th class="text-center">Customer Name</th>
+                    <th class="text-center">Order Amount</th>
+                    <th class="text-center">Order Sent</th>
+                    <th class="text-center">Order Wish</th>
+                    <th class="text-center">Order Expected</th>
+                    <th class="text-center">Order Date</th> 
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <br>
+
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                          <div class="">
+                            <div class="card-body">
+                              <h5 class="card-title">Order Details</h5>
+                              <ul class="list-group">
+                                <li class="list-group-item">Order #<span id="modal-order-id"></span></li>
+                                <li class="list-group-item">Order Date: <span id="modal-order-date"></span></li>
+                                <li class="list-group-item">Order Amount: $<span id="modal-amount-paid"></span>s</li>
+                                <li class="list-group-item">Order Status: <span id="modal-delivery-mode"></span></li>
+                                <li class="list-group-item">Order Sent: <span id="modal-order-sent"></span></li>
+                                <li class="list-group-item">Order Wish: <span id="modal-order-wish"></span></li>
+                                <li class="list-group-item">Order Expected: <span id="modal-order-expected"></span></li>   
+                            </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6">
+                          <div class="">
+                            <div class="card-body">
+                              <h5 class="card-title">Customer Details</h5>
+                              <ul class="list-group">
+                                <li class="list-group-item">Customer Name: <span id="modal-customer-name"></span></li>
+                                <li class="list-group-item">Mobile: <span id="modal-mobile">123-456-7890</span></li>
+                                <li class="list-group-item">Email: <span id="modal-email">lucy@example.com</span></li>
+                                <li class="list-group-item">Loyalty Points: <span id="modal-loyalty-points">150</span></li>
+                                <li class="list-group-item">Customer Since: <span id="modal-customer-since">2020-01-15</span></li>
+                                <li class="list-group-item">Total Value: $<span id="modal-total-value">1234.56</span></li>
+                                <li class="list-group-item">Address: <span id="modal-address">123 Elm Street, Springfield, IL</span></li>                                </ul>
+                                 </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="container">
+                        <div class="text-center mt-4">
+                            <button type="button" class="btn btn-info" onclick="toastOrder('Are you sure you want to Return this order?', 'RETURN')">Return</button>
+                            <button type="button" class="btn btn-info" onclick="toastOrder('Are you sure you want to Refund this order?', 'REFUND')">Refund</button>
+                            <button type="button" class="btn btn-info" onclick="toastOrder('Are you sure you want to Replace this order?', 'REPLACE')">Replacement</button>
+                            <a href="https://muthamilan.freshdesk.com/a/tickets/new" role="button" class="btn btn-info" target="_blank">Raise a Ticket</a>
+
+                        </div>
+                    </div>
+                    <br>
+                    <h5>Order Items</h5>
+                    <table id="orderItemsTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Product Name</th>
+                                <th>No. of Units</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br>
+
+                    <h5>Delivery Details</h5>
+                    <table id="deliveryDetailsTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Delivery Mode</th>
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th>Tracking</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rows will be dynamically added here -->
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="contactModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalLabel">Contact Us for Support</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>If you need assistance, please reach out to our support team:</p>
+                    <ul>
+                        <li>Email: support@example.com</li>
+                        <li>Phone: (123) 456-7890</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="./scripts/app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const table = $('#ordersTable').DataTable();
+            fetch('http://ec2-43-205-116-125.ap-south-1.compute.amazonaws.com:3000/orders')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(order => {
+                        const formattedDate = new Date(order.order_date).toISOString().split('T')[0];
+                        table.row.add([
+                            `<a href="#" class="order-link" onclick="handleClick(${order.order_id})">${order.order_identifier}</a>`,
+                            order.delivery_mode,
+                            order.customer_name || 'N/A',
+                            `$${order.amount_paid}`,
+                            order.order_sent,
+                            order.order_wish,
+                            order.order_expected,
+                            formattedDate
+                        ]).draw();
+                    });
+                    $('#ordersTable tbody tr').each(function() {
+                        $(this).find('td').addClass('text-center');
+                    });
+                });
+        });
+        $(document).ready(function(){
+            $('#contactSupportBtn').click(function(){
+                $('#contactModal').modal('show');
+            });
+        });
+        $(document).ready(function () {
+            $('#orderItemsTable').DataTable({
+                searching: false,  
+                paging: false,   
+                info: false       
+            });
+
+            $('#deliveryDetailsTable').DataTable({
+                searching: false,  
+                paging: false,     
+                info: false       
+            });
+        });
+    </script>
+</body>
+
+</html>
