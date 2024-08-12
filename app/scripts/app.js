@@ -80,7 +80,7 @@ async function raiseTicket() {
 async function handleClick(orderId) {  
   try {
       // Fetch order details
-      const response = await fetch(`http://ec2-13-233-225-185.ap-south-1.compute.amazonaws.com:3000/orders/${orderId}`);
+      const response = await fetch(`http://ec2-3-110-170-64.ap-south-1.compute.amazonaws.com:3000/orders/${orderId}`);
       const order = await response.json();
 
       // Update modal with order details
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchOrderData() {
   try {
-  const response = await fetch(`http://ec2-13-233-225-185.ap-south-1.compute.amazonaws.com:3000/orders`);
+  const response = await fetch(`http://ec2-3-110-170-64.ap-south-1.compute.amazonaws.com:3000/orders`);
   const orders = await response.json();
     console.log('fetchOrderData', orders)
           const labels = [];

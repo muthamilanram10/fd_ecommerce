@@ -190,7 +190,7 @@
     <script>
         $(document).ready(function () {
             const table = $('#ordersTable').DataTable();
-            fetch('http://ec2-13-233-225-185.ap-south-1.compute.amazonaws.com:3000/orders')
+            fetch('http://ec2-3-110-170-64.ap-south-1.compute.amazonaws.com:3000/orders')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(order => {
